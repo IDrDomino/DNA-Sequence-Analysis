@@ -190,10 +190,91 @@ Insights into the distribution of nucleotides within the COVID-19 DNA sequence
  'T': 32.125984251968504}
 ```
 
+Now, we converted the nucleotide composition dictionary (ndict) into a Pandas DataFrame (ndf). The DataFrame includes two columns: "Nucleotide" and "Composition," making it a structured and easy-to-read format for further analysis or visualization.
+
 ```python
 import pandas as pd
 ndf = pd.DataFrame.from_dict(ndict, orient ='index')
 ndf = ndf.reset_index()
 ndf = ndf.rename(columns={"index": "Nucleotide", 0: "Composition"})
 ```
+
+Now using the Seaborn library to create a bar plot based on the nucleotide composition data stored in the Pandas DataFrame (ndf).
+
+```python
+ax = sns.barplot(x="Nucleotide", y="Composition", data=ndf)
+```
+
+![__results___19_0](https://github.com/IDrDomino/DNA-Sequence-Analysis-/assets/154571800/4fbf6b13-378c-461b-8934-3a2d99625905)
+
+# Calculating GC-content of the DNA
+In polymerase chain reaction (PCR) studies, the GC-content of short oligonucleotides referred to as primers is frequently employed to estimate their annealing temperature to the template DNA. A heightened GC-content signifies a comparatively elevated melting temperature, thereby indicating increased stability.
+
+GC function from BioPython's SeqUtils module to calculate the GC percentage of the DNA sequence (ncov_dna).
+```python
+from Bio.SeqUtils import GC
+print(f"GC% :{GC(ncov_dna)}")
+```
+```
+GC% :37.96615848550846
+```
+
+# Tri-nucleotide compositions
+Within the realm of bioinformatics, k-mers are subsequences of a specified length denoted as {\displaystyle k}. This concept is integral to computational genomics and sequence analysis, particularly in the field of genomics where k-mers consist of nucleotides (A, T, G, and C). The application of k-mers is widespread, encompassing tasks such as DNA sequence assembly, enhancement of heterologous gene expression, species identification in metagenomic samples, and the development of attenuated vaccines.
+
+Defined a set of trinucleotides (trimers) and created a function, trimer_composition, to calculate the count of each trinucleotide in a given DNA sequence (genome). This function will return a dictionary where keys are the trimers, and values are their respective counts in the provided DNA sequence.
+
+```python
+# tri-nucleotide compositions
+trimers = ["AAA", "AAC", "AAG", "AAT", "ACA", "ACC", "ACG", "ACT", "AGA", "AGC", "AGG", "ATA", "ATC", "ATG", "CAA", 
+           "CAC", "CAG", "CCA","CCC","CCG","CGA","CGC","CTA","CTC","GAA","GAC","GCA","GCC","GGA","GTA","TAA","TCA"]
+
+def trimer_composition(genome):
+    trimer_dict = dict()
+    for trimer in trimers:
+        trimer_dict[trimer] = genome.count(trimer)
+    return trimer_dict
+```
+
+```
+composition = trimer_composition(ncov_dna)
+total_composition = sum(composition.values())
+norm_freq = [count/total_composition for count in composition.values()]
+print(composition)
+print(total_composition)
+print(norm_freq)
+```
+
+```
+{'AAA': 641, 'AAC': 615, 'AAG': 575, 'AAT': 760, 'ACA': 754, 'ACC': 371, 'ACG': 164, 'ACT': 674, 'AGA': 567, 'AGC': 300, 'AGG': 328, 'ATA': 446, 'ATC': 339, 'ATG': 722, 'CAA': 702, 'CAC': 427, 'CAG': 437, 'CCA': 353, 'CCC': 102, 'CCG': 73, 'CGA': 95, 'CGC': 94, 'CTA': 555, 'CTC': 270, 'GAA': 531, 'GAC': 338, 'GCA': 371, 'GCC': 188, 'GGA': 280, 'GTA': 468, 'TAA': 717, 'TCA': 550}
+13807
+[0.046425726080973416, 0.04454262330701818, 0.04164554211631781, 0.05504454262330702, 0.054609980444701965, 0.026870428043745925, 0.011878032881871515, 0.04881581806330122, 0.041066125878177734, 0.02172810893025277, 0.02375606576374303, 0.032302455276309115, 0.02455276309118563, 0.05229231549214167, 0.05084377489679148, 0.030926341710726443, 0.03165061200840154, 0.02556674150793076, 0.007387557036285942, 0.005287173173028174, 0.006880567827913377, 0.006808140798145868, 0.040197001520967626, 0.019555298037227494, 0.038458752806547404, 0.024480336061418122, 0.026870428043745925, 0.013616281596291736, 0.020279568334902586, 0.03389584993119432, 0.05193018034330412, 0.03983486637213008]`
+```
+
+Now, converting the trinucleotide composition dictionary (composition) into a Pandas DataFrame (tri)
+```python
+tri = pd.DataFrame.from_dict(composition, orient ='index')
+tri = tri.reset_index()
+tri = tri.rename(columns={"index": "trimer", 0: "count"})
+```
+
+Now, using Pandas and styling with a bar chart and a background gradient to visualize the trinucleotide counts in descending order.
+
+```python
+r1 = tri.sort_values(by='count', ascending=False)
+r1.style.bar(subset=["count"],color='#').background_gradient(cmap='Reds')
+```
+
+![image](https://github.com/IDrDomino/DNA-Sequence-Analysis-/assets/154571800/db5ff49b-684c-4c00-b857-9eecea7274fa)
+
+Finally, creates a horizontal bar plot where trinucleotides are represented on the y-axis, and their respective counts are represented on the x-axis. The fig_dims variable determines the size of the plot.
+
+```python
+fig_dims = (12, 8)
+fig, ax = plt.subplots(figsize=fig_dims)
+sns.barplot(x="count", y="trimer", ax=ax, data=tri)
+```
+![__results___27_1](https://github.com/IDrDomino/DNA-Sequence-Analysis-/assets/154571800/96178874-a6a5-4fdc-bca6-b2f85f9c312e)
+
+
 
