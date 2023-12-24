@@ -1,4 +1,4 @@
-# DNA-Sequence-Analysis-
+# DNA-Sequence-Analysis
 
 ## Overview
 
