@@ -274,7 +274,7 @@ fig_dims = (12, 8)
 fig, ax = plt.subplots(figsize=fig_dims)
 sns.barplot(x="count", y="trimer", ax=ax, data=tri)
 ```
-![__results___27_1](https://github.com/IDrDomino/DNA-Sequence-Analysis-/assets/154571800/96178874-a6a5-4fdc-bca6-b2f85f9c312e)
 
+![image](https://github.com/IDrDomino/DNA-Sequence-Analysis/assets/154571800/d41f2aff-334f-48d7-bf9f-13428eb6ad86)
 
 
